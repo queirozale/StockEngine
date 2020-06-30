@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>AITCA C. Prediction</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="{{ url_for('static', filename='css/simple-sidebar.css') }}" rel="stylesheet">
+</head>
+
+<body>
+  <div class="d-flex" id="wrapper">
+    <!-- Sidebar -->
+    <div class="bg-light border-right" id="sidebar-wrapper">
+      <div class="sidebar-heading">
+        <!-- <img src="{{ url_for('static', filename='images/logo.jpeg') }}"> -->
+        AITCA C.
+      </div>
+      <div class="list-group list-group-flush">
+        <a href="#" class="list-group-item list-group-item-action bg-light">Dashboard</a>
+        <a href="#" class="list-group-item list-group-item-action bg-light">Shortcuts</a>
+        <a href="#" class="list-group-item list-group-item-action bg-light">Overview</a>
+        <a href="#" class="list-group-item list-group-item-action bg-light">Events</a>
+        <a href="#" class="list-group-item list-group-item-action bg-light">Profile</a>
+        <a href="#" class="list-group-item list-group-item-action bg-light">Status</a>
+      </div>
+    </div>
+    <!-- /#sidebar-wrapper -->
+  
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+  
+      <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+  
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+  
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+              <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">About</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Settings
+              </a>
+              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="#">Change password</a>
+                <!-- <a class="dropdown-item" href="#">Another action</a> -->
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Logout</a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </nav>
+  
+      <div class="container-fluid">
+        <h1 class="mt-4">USA Stock Market Prediction Engine</h1><br>
+  
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <h4 class="text-center">{{ ticker }}</h4>
+        <table class="table">
+            <tr>
+                <th class="text-center">Date</th>
+                <th class="text-center">Prediction($)</th>
+            </tr>
+            {% for key, value in results.items() %}
+                <tr>
+                    <td class="text-center">{{ key }}</td>
+                    <td class="text-center">{{ value }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        <div class="text-center">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">Back</a>
+        </div><br>
+
+        <div class="container-fluid">
+            <canvas id="PredChart" style="height:40vh; width:50vw"></canvas>
+        </div><br>
+      </div>
+    </div>
+    <!-- /#page-content-wrapper -->
+  </div>
+  <!-- /#wrapper -->
+</body>
+
+<!-- Bootstrap core JavaScript -->
+<script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+<script>
+let myChart = runPredChart();
+
+function runPredChart () {
+	var ctx_live = document.getElementById("PredChart").getContext('2d');
+    var dates = {{ dates|safe }};
+    var pred = [];
+    {% for key, value in results.items() %}
+        pred.push({{ value }});
+    {% endfor %}
+	var myChart = new Chart(ctx_live, {
+		type: 'line',
+		data: {
+			labels: dates,
+			datasets: [{
+			data: pred,
+				lineTension: 0.1,
+				borderWidth: 1,
+				borderColor:'rgba(77, 232, 118, 0.5)',
+				backgroundColor: 'rgba(77, 232, 118, 0.1)',
+				label: 'Predictions',
+			}]
+        },
+
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Next days predictions',
+            },
+            legend: {
+                display: true
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: false,
+                    }
+                }]
+            },
+	    }
+    });
+
+	return myChart;
+};
+</script>
